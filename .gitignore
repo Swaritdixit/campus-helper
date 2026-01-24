@@ -15,6 +15,7 @@ __pycache__/
 .anaconda/
 *.log
 *.ini
+*.env
 # Logs
 logs
 *.log

@@ -6,15 +6,19 @@ export default function Events() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    getDocs(collection(db,"Events"))
-      .then(s => setEvents(s.docs.map(d => d.data())));
+    getDocs(collection(db, "Events")).then((snap) => {
+      setEvents(snap.docs.map(d => d.data()));
+    });
   }, []);
 
-  return events.map((e,i) => (
-    <div key={i}>
-      <b>{e.name}</b>
-      <p>{e.date} | {e.time}</p>
-      <small>{e.venue}</small>
+  return (
+    <div>
+      <h2>Campus Events</h2>
+      {events.map((e, i) => (
+        <div key={i}>
+          <b>{e.name}</b> – {e.date} @ {e.venue}
+        </div>
+      ))}
     </div>
-  ));
+  );
 }

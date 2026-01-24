@@ -1,4 +1,5 @@
 import "../styles/dashboard.css";
+import React from "react";
 
 export default function Home({ setPage }) {
   return (
@@ -23,6 +24,11 @@ export default function Home({ setPage }) {
       <div className="card pink" onClick={() => setPage("wellness")}>
         <h3>MindCare AI</h3>
         <p>Wellness & counselling</p>
+      </div>
+
+      <div className="card orange" onClick={() => setPage("people_pulse")}>
+        <h3>People Pulse</h3>
+        <p>Student sentiment analysis</p>
       </div>
     </>
   );

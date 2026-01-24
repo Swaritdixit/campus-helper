@@ -1,6 +1,7 @@
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { useState } from "react";
+import React from "react";
 
 export default function Wellness() {
   const [msg, setMsg] = useState("");

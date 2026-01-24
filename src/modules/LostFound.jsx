@@ -1,20 +1,24 @@
-import { collection, getDocs, where, query } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { db } from "../firebase/firebase";
-import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function LostFound() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    getDocs(query(collection(db,"items"), where("active","==",true)))
-      .then(s => setItems(s.docs.map(d => d.data())));
+    const load = async () => {
+      const snap = await getDocs(collection(db, "items"));
+      setItems(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    };
+    load();
   }, []);
 
-  return items.map((i, k) => (
-    <div key={k}>
-      <h4>{i.title}</h4>
-      <p>{i.description}</p>
-      <small>{i.type}</small>
+  return (
+    <div>
+      <h2>Lost & Found</h2>
+      {items.map(i => (
+        <div key={i.id}>{i.title}</div>
+      ))}
     </div>
-  ));
+  );
 }

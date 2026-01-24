@@ -1,6 +1,7 @@
 import { collection, getDocs, doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { useEffect, useState } from "react";
+import React from "react";
 
 export default function Pulse() {
   const [polls, setPolls] = useState([]);
