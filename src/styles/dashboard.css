@@ -1,0 +1,13 @@
+.card {
+  padding: 25px;
+  border-radius: 25px;
+  color: white;
+  margin: 18px 0;
+  cursor: pointer;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.purple { background: linear-gradient(135deg,#5f2c82,#8e44ad); }
+.blue { background: linear-gradient(135deg,#2193b0,#6dd5ed); }
+.green { background: linear-gradient(135deg,#11998e,#38ef7d); }
+.pink { background: linear-gradient(135deg,#ee0979,#ff6a00); }

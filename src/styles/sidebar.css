@@ -1,0 +1,21 @@
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #1f2937;
+  color: white;
+  padding: 15px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 6px 0;
+}
+
+.logout {
+  margin-top: 20px;
+  animation: slide 0.3s ease;
+}
+
+@keyframes slide {
+  to { transform: translateX(-10px); opacity: 0.7; }
+}
