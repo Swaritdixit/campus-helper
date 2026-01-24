@@ -1,3 +1,20 @@
+# OS files
+Thumbs.db
+Desktop.ini
+
+# VS Code / Python
+__pycache__/
+*.pyc
+*.pyo
+*.env
+.venv/
+.ipynb_checkpoints/
+.vscode/
+
+# Anaconda / system files
+.anaconda/
+*.log
+*.ini
 # Logs
 logs
 *.log
