@@ -1,38 +1,132 @@
-export default async function handler(req, res) {
-  console.log("✅ /api/wellness HIT");
-  console.log("METHOD:", req.method);
-  console.log("HEADERS:", req.headers);
-  console.log("BODY:", req.body);
+import React, { useState, useRef, useEffect } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+import "../styles/wellness.css";
 
-  if (req.method !== "POST") {
-    console.error("❌ Wrong method");
-    return res.status(405).json({ error: "Only POST allowed" });
-  }
+export default function Wellness() {
+  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [hasStarted, setHasStarted] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const { message } = req.body || {};
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory]);
 
-  if (!message) {
-    console.error("❌ Message missing in body");
-    return res.status(400).json({
-      error: "Message missing",
-      receivedBody: req.body,
-    });
-  }
+  const send = async () => {
+    if (!msg.trim() || loading) return;
 
-  const API_KEY = process.env.GOOGLE_API_KEY;
+    const userMsg = msg;
+    setMsg("");
+    setLoading(true);
+    if (!hasStarted) setHasStarted(true);
 
-  if (!API_KEY) {
-    console.error("❌ GOOGLE_API_KEY missing");
-    return res.status(500).json({
-      error: "Server misconfigured: API Key missing",
-    });
-  }
+    // show user message instantly
+    setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
 
-  console.log("✅ Message received:", message);
-  console.log("✅ API key present");
+    try {
+      console.log("➡ Sending message to /api/wellness:", userMsg);
 
-  // TEMP dummy response (no AI call yet)
-  const reply = `I hear you. You said: "${message}"`;
+      const res = await fetch("/api/wellness", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMsg }),
+      });
 
-  return res.status(200).json({ reply });
+      console.log("⬅ Response received:", res);
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("❌ Backend error:", res.status, text);
+        throw new Error("Backend failed");
+      }
+
+      const data = await res.json();
+      console.log("✅ Parsed JSON from backend:", data);
+
+      const aiReply =
+        data?.reply ||
+        "I'm here with you. Can you tell me a little more?";
+
+      // replace placeholder
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1].ai = aiReply;
+        return updated;
+      });
+
+      // save chat
+      await addDoc(collection(db, "wellness_chats"), {
+        message: userMsg,
+        reply: aiReply,
+        createdAt: new Date(),
+      });
+
+      console.log("💾 Saved chat to Firestore");
+    } catch (err) {
+      console.error("🔥 Wellness API failed:", err);
+
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1].ai =
+          "I'm having a little trouble right now, but I'm still here with you 💙";
+        return updated;
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="wellness-container">
+      {!hasStarted && (
+        <>
+          <div className="wellness-heart">❤️</div>
+          <h1 className="wellness-title">MindCare AI</h1>
+          <p className="wellness-subtitle">
+            Your personal mental wellness companion.
+            <br />
+            Safe. Anonymous. Supportive.
+          </p>
+        </>
+      )}
+
+      <div className={`chat-container ${hasStarted ? "chat-started" : ""}`}>
+        <div className="chat-box">
+          {chatHistory.map((chat, i) => (
+            <div key={i} className="chat-message">
+              <p className="user-msg">{chat.user}</p>
+              <p className="ai-msg">{chat.ai}</p>
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+
+        <div className="input-area">
+          <input
+            className="wellness-input"
+            value={msg}
+            onChange={e => setMsg(e.target.value)}
+            placeholder="How are you feeling today?"
+            disabled={loading}
+            onKeyDown={e => e.key === "Enter" && send()}
+          />
+          <button
+            className="wellness-button"
+            onClick={send}
+            disabled={loading}
+          >
+            {loading ? "Thinking..." : "Send"}
+          </button>
+        </div>
+      </div>
+
+      {!hasStarted && (
+        <p className="wellness-footer">You are not alone 💙</p>
+      )}
+    </div>
+  );
 }
