@@ -21,7 +21,7 @@ export default function Home() {
         {/* APP DOWNLOAD LINE */}
 
       <p className="dashboard-app">
-  📱 We also have an app for this —{" "}
+  📱 The main platform is a mobile application, available for download and installation on Android.—{" "}
   <a
     href="https://drive.google.com/file/d/1tnFt2Q9IO3lbopSl4huIYAFGgABWlDdH/view?usp=sharing"
     target="_blank"
