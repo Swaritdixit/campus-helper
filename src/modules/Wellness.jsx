@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { addDoc, collection } from "firebase/firestore";
+import React, { useState, useEffect, useRef } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import "../styles/wellness.css";
 
@@ -16,6 +16,7 @@ export default function Wellness() {
 
   const send = async () => {
     if (!msg.trim() || loading) return;
+
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
@@ -26,22 +27,20 @@ export default function Wellness() {
         body: JSON.stringify({ userMessage: msg }),
       });
 
-      if (!res.ok) throw new Error("Backend failed");
-
       const data = await res.json();
-      const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
+      const aiReply =
+        data.reply || "I'm here with you. Want to talk more? 💙";
 
-      // Save to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: msg,
         reply: aiReply,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
       });
 
       setChatHistory(prev => [...prev, { user: msg, ai: aiReply }]);
       setMsg("");
     } catch (err) {
-      console.error("Wellness API failed:", err);
+      console.error("Wellness error:", err);
     } finally {
       setLoading(false);
     }
@@ -80,13 +79,19 @@ export default function Wellness() {
             onKeyDown={e => e.key === "Enter" && send()}
             className="wellness-input"
           />
-          <button onClick={send} disabled={loading} className="wellness-button">
+          <button
+            onClick={send}
+            disabled={loading}
+            className="wellness-button"
+          >
             {loading ? "Thinking..." : "Send"}
           </button>
         </div>
       </div>
 
-      {!hasStarted && <p className="wellness-footer">You are not alone 💙</p>}
+      {!hasStarted && (
+        <p className="wellness-footer">You are not alone 💙</p>
+      )}
     </div>
   );
 }
