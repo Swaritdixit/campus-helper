@@ -1,37 +1,65 @@
-// api/wellness.js
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useState } from "react";
+import "../styles/wellness.css";
 
-const API_KEY = process.env.API_KEY;
+export default function Wellness() {
+  const [userMessage, setUserMessage] = useState("");
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-if (!API_KEY) {
-  console.error("❌ API_KEY missing in .env");
-}
+  const sendMessage = async () => {
+    if (!userMessage.trim()) return;
 
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
+    setLoading(true);
+    setError("");
+    setReply("");
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+    try {
+      const res = await fetch("/api/wellness", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userMessage }),
+      });
 
-  try {
-    const { userMessage } = req.body;
+      const data = await res.json();
 
-    if (!userMessage) return res.status(400).json({ error: "User message is required" });
+      if (!res.ok) {
+        throw new Error(data.error || "Request failed");
+      }
 
-    const prompt = `
-You are MindCare AI, a calm, empathetic mental wellness assistant.
-Respond supportively and gently to the user.
+      setReply(data.reply);
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-User: ${userMessage}
-Assistant:
-`;
+  return (
+    <div className="wellness-container">
+      <h2>🧠 MindCare AI</h2>
 
-    const result = await model.generateContent(prompt);
-    const reply = result?.response?.text ? result.response.text() : "I'm here to listen. Can you tell me more?";
+      <textarea
+        value={userMessage}
+        onChange={(e) => setUserMessage(e.target.value)}
+        placeholder="How are you feeling today?"
+      />
 
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error("❌ Wellness API failed:", err);
-    res.status(500).json({ error: "Gemini failed" });
-  }
+      <button onClick={sendMessage} disabled={loading}>
+        {loading ? "Thinking..." : "Send"}
+      </button>
+
+      {reply && (
+        <div className="reply-box">
+          <strong>MindCare AI:</strong>
+          <p>{reply}</p>
+        </div>
+      )}
+
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
 }
