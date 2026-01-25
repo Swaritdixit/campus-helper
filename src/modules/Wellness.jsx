@@ -26,20 +26,28 @@ export default function Wellness() {
     setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
 
     try {
+      console.log("➡ Sending message to /api/wellness:", userMsg);
+
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-
-        // 🔥 FIX: backend expects "message"
         body: JSON.stringify({ message: userMsg }),
       });
 
-      if (!res.ok) throw new Error("Backend failed");
+      console.log("⬅ Response received:", res);
+
+      if (!res.ok) {
+        console.error("❌ Response not OK:", res.status, res.statusText);
+        const text = await res.text();
+        console.error("Response body:", text);
+        throw new Error("Backend failed");
+      }
 
       const data = await res.json();
+      console.log("✅ Parsed JSON from backend:", data);
+
       const aiReply =
-        data?.reply ||
-        "I'm here to listen. Can you tell me more?";
+        data?.reply || "I'm here to listen. Can you tell me more?";
 
       // replace placeholder
       setChatHistory(prev => {
@@ -48,13 +56,18 @@ export default function Wellness() {
         return updated;
       });
 
-      await addDoc(collection(db, "wellness_chats"), {
-        message: userMsg,
-        reply: aiReply,
-        createdAt: new Date(),
-      });
+      try {
+        await addDoc(collection(db, "wellness_chats"), {
+          message: userMsg,
+          reply: aiReply,
+          createdAt: new Date(),
+        });
+        console.log("💾 Saved chat to Firestore");
+      } catch (dbErr) {
+        console.error("❌ Firestore save failed:", dbErr);
+      }
     } catch (err) {
-      console.error("Wellness API failed:", err);
+      console.error("🔥 Wellness API failed:", err);
 
       setChatHistory(prev => {
         const updated = [...prev];

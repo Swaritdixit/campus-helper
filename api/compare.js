@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       score,
       confidence,
-      reason: `Matched ${commonWords} words in title/description`,
+  
     });
   } catch (err) {
     console.error("Compare error:", err);
