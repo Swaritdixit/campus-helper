@@ -10,7 +10,9 @@ export default function LostFound() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [focusedCard, setFocusedCard] = useState(null);
+  const [ownerModal, setOwnerModal] = useState(null);
 
+  // Load items from Firebase
   const loadItems = async (tab, toggle) => {
     if (tab === "matches") return; // handled separately
     setLoading(true);
@@ -38,11 +40,13 @@ export default function LostFound() {
     setFocusedCard(null);
   }, [mainTab, subTab]);
 
-  const handlePageClick = () => setFocusedCard(null);
+  const handlePageClick = () => {
+    setFocusedCard(null);
+  };
 
   return (
     <div className="lf-page" onClick={handlePageClick}>
-      {/* TOP CONTROLS */}
+      {/* Top Controls */}
       <div className="lf-top-controls">
         <div className="lf-tabs main">
           <button
@@ -80,7 +84,7 @@ export default function LostFound() {
         )}
       </div>
 
-      {/* LOST / FOUND GRID */}
+      {/* Lost / Found Grid */}
       {mainTab !== "matches" && (
         <>
           {loading && <p className="lf-loading">Loading {mainTab} items…</p>}
@@ -99,13 +103,8 @@ export default function LostFound() {
                   <button
                     className="contact-owner-btn"
                     onClick={(e) => {
-                      e.preventDefault();
                       e.stopPropagation();
-                      if (!item.ownerName) {
-                        alert("Owner info not available");
-                      } else {
-                        alert(`Contact ${item.ownerName}!`);
-                      }
+                      setOwnerModal(item);
                     }}
                   >
                     Contact Owner
@@ -117,8 +116,21 @@ export default function LostFound() {
         </>
       )}
 
-      {/* MATCHES */}
+      {/* Matches Tab */}
       {mainTab === "matches" && <Matches />}
+
+      {/* Owner Contact Modal */}
+      {ownerModal && (
+        <div className="modal-overlay" onClick={() => setOwnerModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Contact Owner</h3>
+            <p><strong>Name:</strong> {ownerModal.ownerName || "N/A"}</p>
+            {ownerModal.ownerEmail && <p><strong>Email:</strong> <a href={`mailto:${ownerModal.ownerEmail}`}>{ownerModal.ownerEmail}</a></p>}
+            {ownerModal.ownerPhone && <p><strong>Phone:</strong> {ownerModal.ownerPhone}</p>}
+            <button onClick={() => setOwnerModal(null)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
