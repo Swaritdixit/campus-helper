@@ -1,49 +1,28 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const API_KEY = process.env.GOOGLE_API_KEY;
+if (!API_KEY) console.error("❌ GOOGLE_API_KEY missing");
+
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
+
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
-  }
 
-  const { message } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: "Message missing" });
-  }
+  const { prompt } = req.body;
+  if (!prompt) return res.status(400).json({ error: "Prompt missing" });
 
   try {
-    const API_KEY = process.env.API_KEY;
-    if (!API_KEY) {
-      throw new Error("API_KEY not found in env");
-    }
-
-    const genAI = new GoogleGenerativeAI(API_KEY);
-
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-    });
-
-    const prompt = `
-You are a calm, empathetic self-care and mental wellness assistant.
-Respond kindly, supportively, and briefly.
-Do not give medical diagnosis.
-User message: ${message}
-`;
-
+    // You can add wellness-specific logic here
     const result = await model.generateContent(prompt);
-    const reply = result.response.text();
+    const responseText = result?.response?.text
+      ? result.response.text()
+      : String(result);
 
-    return res.status(200).json({ reply });
+    res.status(200).json({ reply: responseText });
   } catch (err) {
-    console.error("❌ Wellness Gemini Error:", err);
-    return res.status(500).json({ error: "Backend failed" });
-  }
-}
-export default function handler(req, res) {
-  // Example: only GET requests
-  if (req.method === 'GET') {
-    res.status(200).json({ message: 'Wellness API works!' });
-  } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    console.error("Wellness error:", err);
+    res.status(500).json({ error: "Wellness generation failed" });
   }
 }
