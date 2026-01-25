@@ -10,10 +10,12 @@ export default function Wellness() {
   const [hasStarted, setHasStarted] = useState(false);
   const chatEndRef = useRef(null);
 
+  // Scroll to bottom when chat updates
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
+  // Send message to serverless API
   const send = async () => {
     if (!msg.trim() || loading) return;
 
@@ -21,11 +23,11 @@ export default function Wellness() {
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // Call your serverless wellness API
+      // Call serverless wellness API
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: `You are a calm, empathetic mental wellness assistant. Respond supportively.\nUser: ${msg}` }),
+        body: JSON.stringify({ userMessage: msg }), // only user message
       });
 
       const data = await res.json();
@@ -38,6 +40,7 @@ export default function Wellness() {
         createdAt: new Date(),
       });
 
+      // Update local chat
       setChatHistory(prev => [...prev, { user: msg, ai: aiReply }]);
       setMsg("");
     } catch (err) {
@@ -49,6 +52,7 @@ export default function Wellness() {
 
   return (
     <div className="wellness-container">
+      {/* Initial header */}
       {!hasStarted && (
         <>
           <div className="wellness-heart">❤️</div>
@@ -60,6 +64,7 @@ export default function Wellness() {
         </>
       )}
 
+      {/* Chat area */}
       <div className={`chat-container ${hasStarted ? "chat-started" : ""}`}>
         <div className="chat-box">
           {chatHistory.map((chat, i) => (
@@ -73,14 +78,18 @@ export default function Wellness() {
 
         <div className="input-area">
           <input
+            className="wellness-input"
             value={msg}
             onChange={e => setMsg(e.target.value)}
             placeholder="How are you feeling today?"
             disabled={loading}
             onKeyDown={e => e.key === "Enter" && send()}
-            className="wellness-input"
           />
-          <button onClick={send} disabled={loading} className="wellness-button">
+          <button
+            className="wellness-button"
+            onClick={send}
+            disabled={loading}
+          >
             {loading ? "Thinking..." : "Send"}
           </button>
         </div>
