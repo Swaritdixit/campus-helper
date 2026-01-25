@@ -4,14 +4,16 @@ import { db } from "../firebase/firebase";
 import "../styles/matches.css";
 
 export default function Matches() {
-  const [results, setResults] = useState([]);
+  const [lostItems, setLostItems] = useState([]);
+  const [foundItems, setFoundItems] = useState([]);
+  const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [aiProcessing, setAiProcessing] = useState(false);
 
   useEffect(() => {
-    const runMatching = async () => {
+    const fetchItems = async () => {
       setLoading(true);
 
-      // 1️⃣ Fetch lost & found
       const lostSnap = await getDocs(
         query(collection(db, "items"), where("type", "==", "lost"))
       );
@@ -19,80 +21,105 @@ export default function Matches() {
         query(collection(db, "items"), where("type", "==", "found"))
       );
 
-      const lostItems = lostSnap.docs.map(d => ({
-        id: d.id,
-        ...d.data()
-      }));
+      const lostData = lostSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const foundData = foundSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      const foundItems = foundSnap.docs.map(d => ({
-        id: d.id,
-        ...d.data()
-      }));
+      setLostItems(lostData);
+      setFoundItems(foundData);
+      setMatches([]);
+      setLoading(false);
 
-      const matches = [];
+      runMatching(lostData, foundData);
+    };
 
-      // 2️⃣ Compare each lost with each found
-      for (const lost of lostItems) {
-        for (const found of foundItems) {
-          const res = await fetch("http://localhost:5000/compare", {
+    fetchItems();
+  }, []);
+
+  // simple filter before AI
+  const basicMatch = (a, b) => {
+    const ta = `${a.title} ${a.description}`.toLowerCase();
+    const tb = `${b.title} ${b.description}`.toLowerCase();
+    return ta.split(" ").some(w => tb.includes(w));
+  };
+
+  const runMatching = async (lostData, foundData) => {
+    setAiProcessing(true);
+
+    for (const lost of lostData) {
+      for (const found of foundData) {
+
+        if (!basicMatch(lost, found)) continue;
+
+        try {
+          const res = await fetch("/compare", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              itemA: lost,
-              itemB: found
-            })
+            body: JSON.stringify({ itemA: lost, itemB: found }),
           });
+
+          if (!res.ok) continue;
 
           const data = await res.json();
 
           if (data.score >= 50) {
-            matches.push({
-              lost,
-              found,
-              ...data
-            });
+            setMatches(prev => [
+              ...prev,
+              { lost, found, ...data }
+            ]);
           }
+        } catch (e) {
+          console.error("Compare failed", e);
         }
       }
+    }
 
-      setResults(matches);
-      setLoading(false);
-    };
+    setAiProcessing(false);
+  };
 
-    runMatching();
-  }, []);
-
-  if (loading) return <p>Matching items using AI…</p>;
-  if (!results.length) return <p>No similar items found</p>;
+  if (loading) return <p>Loading lost & found items…</p>;
+  if (!lostItems.length || !foundItems.length)
+    return <p>No lost or found items yet</p>;
 
   return (
     <div className="matches-container">
       <h2>Matches</h2>
 
-      {results.map((m, i) => (
-        <div key={i} className="match-card">
-          <div className="match-items">
-            <div className="match-item">
-              <b>Lost:</b> {m.lost.title}
-              <p>{m.lost.description}</p>
+      {matches.length === 0 && aiProcessing && (
+        <p>Finding similar items…</p>
+      )}
+
+      {matches.length === 0 && !aiProcessing && (
+        <p>No similar items found</p>
+      )}
+
+      <div className="matches-grid">
+        {matches.map((m, i) => (
+          <div key={i} className="match-card">
+            <div className="match-items">
+              <div className="match-item">
+                <img src={m.lost.photoUrl || "/placeholder.png"} />
+                <b>Lost:</b> {m.lost.title}
+                <p>{m.lost.description}</p>
+              </div>
+
+              <div className="match-item">
+                <img src={m.found.photoUrl || "/placeholder.png"} />
+                <b>Found:</b> {m.found.title}
+                <p>{m.found.description}</p>
+              </div>
             </div>
 
-            <div className="match-item">
-              <b>Found:</b> {m.found.title}
-              <p>{m.found.description}</p>
+            <div className="match-meta">
+              <span className={`confidence ${m.confidence}`}>
+                {m.confidence.toUpperCase()}
+              </span>
+              <span>Score: {m.score}</span>
             </div>
-          </div>
 
-          <div className="match-meta">
-            <span className={`confidence ${m.confidence}`}>
-              {m.confidence.toUpperCase()}
-            </span>
-            <span>Score: {m.score}</span>
+            <p className="match-reason">🧠 {m.reason}</p>
           </div>
-
-          <p className="match-reason">🧠 {m.reason}</p>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
