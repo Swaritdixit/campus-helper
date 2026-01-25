@@ -14,7 +14,7 @@ export default function LostFound() {
   const loadItems = async (tab, toggle) => {
     if (tab === "matches") return; // handled separately
     setLoading(true);
-    setItems([]); // clear immediately to prevent old items showing
+    setItems([]); // clear old items
     const ref = collection(db, "items");
     let q;
 
@@ -99,8 +99,13 @@ export default function LostFound() {
                   <button
                     className="contact-owner-btn"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
-                      alert(`Contact ${item.ownerName || "owner"}!`);
+                      if (!item.ownerName) {
+                        alert("Owner info not available");
+                      } else {
+                        alert(`Contact ${item.ownerName}!`);
+                      }
                     }}
                   >
                     Contact Owner
