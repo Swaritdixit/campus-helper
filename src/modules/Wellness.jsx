@@ -1,92 +1,37 @@
-import React, { useState, useRef, useEffect } from "react";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import "../styles/wellness.css";
+// api/wellness.js
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default function Wellness() {
-  const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
-  const [hasStarted, setHasStarted] = useState(false);
-  const chatEndRef = useRef(null);
+const API_KEY = process.env.API_KEY;
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory]);
+if (!API_KEY) {
+  console.error("❌ API_KEY missing in .env");
+}
 
-  const send = async () => {
-    if (!msg.trim() || loading) return;
-    setLoading(true);
-    if (!hasStarted) setHasStarted(true);
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
 
-    try {
-      const res = await fetch("/api/wellness", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: msg }),
-      });
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-      if (!res.ok) throw new Error("Backend failed");
+  try {
+    const { userMessage } = req.body;
 
-      const data = await res.json();
-      const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
+    if (!userMessage) return res.status(400).json({ error: "User message is required" });
 
-      // Save to Firestore
-      await addDoc(collection(db, "wellness_chats"), {
-        message: msg,
-        reply: aiReply,
-        createdAt: new Date(),
-      });
+    const prompt = `
+You are MindCare AI, a calm, empathetic mental wellness assistant.
+Respond supportively and gently to the user.
 
-      setChatHistory(prev => [...prev, { user: msg, ai: aiReply }]);
-      setMsg("");
-    } catch (err) {
-      console.error("Wellness API failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+User: ${userMessage}
+Assistant:
+`;
 
-  return (
-    <div className="wellness-container">
-      {!hasStarted && (
-        <>
-          <div className="wellness-heart">❤️</div>
-          <h1 className="wellness-title">MindCare AI</h1>
-          <p className="wellness-subtitle">
-            Your personal mental wellness companion.<br />
-            Safe. Anonymous. Supportive.
-          </p>
-        </>
-      )}
+    const result = await model.generateContent(prompt);
+    const reply = result?.response?.text ? result.response.text() : "I'm here to listen. Can you tell me more?";
 
-      <div className={`chat-container ${hasStarted ? "chat-started" : ""}`}>
-        <div className="chat-box">
-          {chatHistory.map((chat, i) => (
-            <div key={i} className="chat-message">
-              <p className="user-msg">{chat.user}</p>
-              <p className="ai-msg">{chat.ai}</p>
-            </div>
-          ))}
-          <div ref={chatEndRef} />
-        </div>
-
-        <div className="input-area">
-          <input
-            value={msg}
-            onChange={e => setMsg(e.target.value)}
-            placeholder="How are you feeling today?"
-            disabled={loading}
-            onKeyDown={e => e.key === "Enter" && send()}
-            className="wellness-input"
-          />
-          <button onClick={send} disabled={loading} className="wellness-button">
-            {loading ? "Thinking..." : "Send"}
-          </button>
-        </div>
-      </div>
-
-      {!hasStarted && <p className="wellness-footer">You are not alone 💙</p>}
-    </div>
-  );
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("❌ Wellness API failed:", err);
+    res.status(500).json({ error: "Gemini failed" });
+  }
 }
