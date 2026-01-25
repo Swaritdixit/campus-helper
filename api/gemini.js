@@ -4,7 +4,7 @@ const API_KEY = process.env.GOOGLE_API_KEY;
 if (!API_KEY) console.error("❌ GOOGLE_API_KEY missing");
 
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini/1.5/flash" });
+const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
 
 export default async function handler(req, res) {
   if (req.method !== "POST")
