@@ -10,10 +10,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Message missing" });
     }
 
-    const API_KEY = process.env.GEMINI_API_KEY;
+    const API_KEY = process.env.GOOGLE_API_KEY;
 
     if (!API_KEY) {
-      console.error("Missing GEMINI_API_KEY");
+      console.error("Missing GOOGLE_API_KEY");
       return res.status(500).json({ error: "Server misconfigured" });
     }
 
