@@ -1,3 +1,4 @@
+// vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -5,8 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/compare": "http://localhost:5000",
-      "/api": "http://localhost:5000",
+      "/api": "http://localhost:5000", // if you still have Express for local dev
     },
   },
 });
