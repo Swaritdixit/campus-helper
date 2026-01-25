@@ -5,22 +5,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: "Message missing" });
+
+  const API_KEY = process.env.GOOGLE_API_KEY; // must match Vercel env
+  if (!API_KEY) {
+    console.error("❌ GOOGLE_API_KEY missing");
+    return res.status(500).json({ error: "Server misconfigured" });
+  }
+
   try {
-    const { message } = req.body;
-
-    if (!message) {
-      return res.status(400).json({ error: "Message missing" });
-    }
-
-    const API_KEY = process.env.API_KEY;
-
-    if (!API_KEY) {
-      console.error("❌ API_KEY missing");
-      return res.status(500).json({ error: "Server misconfigured" });
-    }
-
-    // Initialize client
-    const aiClient = new GoogleGenerativeAI({ apiKey: API_KEY });
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
 
     const prompt = `
 You are MindCare AI, a calm, empathetic mental wellness assistant.
@@ -32,18 +28,18 @@ User says:
 "${message}"
 `;
 
-    // Generate response
-    const result = await aiClient.generateText({
-      model: "gemini-1.5-flash",
-      text: prompt,
-    });
+    const result = await model.generateContent(prompt);
 
-    // Extract the AI's reply
-    const reply = result.output[0].content;
+    const reply = result?.response?.text
+      ? result.response.text()
+      : "I'm here to listen. Can you tell me more?";
 
-    return res.status(200).json({ reply });
+    res.status(200).json({ reply });
   } catch (err) {
     console.error("❌ Wellness Gemini error:", err);
-    return res.status(500).json({ error: "Backend failed" });
+    res.status(500).json({
+      error:
+        "I'm having a little trouble right now, but I'm still here with you 💙",
+    });
   }
 }
