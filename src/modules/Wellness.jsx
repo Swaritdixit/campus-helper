@@ -16,23 +16,22 @@ export default function Wellness() {
 
   const send = async () => {
     if (!msg.trim() || loading) return;
+
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // send dynamic user input to backend
+      // Only send user message to serverless function
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userMessage: msg }),
       });
 
-      if (!res.ok) throw new Error("Backend failed");
-
       const data = await res.json();
       const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
 
-      // save to Firestore
+      // Save chat to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: msg,
         reply: aiReply,
@@ -74,14 +73,18 @@ export default function Wellness() {
 
         <div className="input-area">
           <input
+            className="wellness-input"
             value={msg}
             onChange={e => setMsg(e.target.value)}
             placeholder="How are you feeling today?"
             disabled={loading}
             onKeyDown={e => e.key === "Enter" && send()}
-            className="wellness-input"
           />
-          <button onClick={send} disabled={loading} className="wellness-button">
+          <button
+            className="wellness-button"
+            onClick={send}
+            disabled={loading}
+          >
             {loading ? "Thinking..." : "Send"}
           </button>
         </div>

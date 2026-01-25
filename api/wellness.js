@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.API_KEY;
 
-if (!API_KEY) console.error("❌ GOAPI_KEY missing");
+if (!API_KEY) console.error("❌ API_KEY missing");
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
