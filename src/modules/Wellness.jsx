@@ -14,7 +14,7 @@ export default function Wellness() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  const send = async () => {
+  async function send() {
     if (!msg.trim() || loading) return;
 
     const userMsg = msg;
@@ -22,74 +22,57 @@ export default function Wellness() {
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
-    // show user message instantly
-    setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
+    // Show user message immediately
+    setChatHistory((prev) => [...prev, { user: userMsg, ai: "Thinking..." }]);
 
     try {
-      console.log("➡ Sending message to /api/wellness:", userMsg);
-
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg }),
       });
 
-      console.log("⬅ Response received:", res);
-
       if (!res.ok) {
-        console.error("❌ Response not OK:", res.status, res.statusText);
-        const text = await res.text();
-        console.error("Response body:", text);
-        throw new Error("Backend failed");
+        throw new Error("Backend error");
       }
 
       const data = await res.json();
-      console.log("✅ Parsed JSON from backend:", data);
-
       const aiReply =
-        data?.reply || "I'm here to listen. Can you tell me more?";
+        data.reply || "I'm here to listen. Tell me more.";
 
-      // replace placeholder
-      setChatHistory(prev => {
+      // Replace last AI placeholder
+      setChatHistory((prev) => {
         const updated = [...prev];
         updated[updated.length - 1].ai = aiReply;
         return updated;
       });
 
-      try {
-        await addDoc(collection(db, "wellness_chats"), {
-          message: userMsg,
-          reply: aiReply,
-          createdAt: new Date(),
-        });
-        console.log("💾 Saved chat to Firestore");
-      } catch (dbErr) {
-        console.error("❌ Firestore save failed:", dbErr);
-      }
+      // Save to Firestore
+      await addDoc(collection(db, "wellness_chats"), {
+        message: userMsg,
+        reply: aiReply,
+        createdAt: new Date(),
+      });
     } catch (err) {
-      console.error("🔥 Wellness API failed:", err);
-
-      setChatHistory(prev => {
+      console.error("Wellness error:", err);
+      setChatHistory((prev) => {
         const updated = [...prev];
         updated[updated.length - 1].ai =
-          "I'm having a little trouble right now, but I'm still here with you 💙";
+          "I'm having trouble right now, but I'm still here with you.";
         return updated;
       });
-    } finally {
-      setLoading(false);
     }
-  };
+
+    setLoading(false);
+  }
 
   return (
     <div className="wellness-container">
       {!hasStarted && (
         <>
-          <div className="wellness-heart">❤️</div>
           <h1 className="wellness-title">MindCare AI</h1>
           <p className="wellness-subtitle">
             Your personal mental wellness companion.
-            <br />
-            Safe. Anonymous. Supportive.
           </p>
         </>
       )}
@@ -107,26 +90,17 @@ export default function Wellness() {
 
         <div className="input-area">
           <input
-            className="wellness-input"
             value={msg}
-            onChange={e => setMsg(e.target.value)}
+            onChange={(e) => setMsg(e.target.value)}
             placeholder="How are you feeling today?"
             disabled={loading}
-            onKeyDown={e => e.key === "Enter" && send()}
+            onKeyDown={(e) => e.key === "Enter" && send()}
           />
-          <button
-            className="wellness-button"
-            onClick={send}
-            disabled={loading}
-          >
-            {loading ? "Thinking..." : "Send"}
+          <button onClick={send} disabled={loading}>
+            {loading ? "..." : "Send"}
           </button>
         </div>
       </div>
-
-      {!hasStarted && (
-        <p className="wellness-footer">You are not alone 💙</p>
-      )}
     </div>
   );
 }
