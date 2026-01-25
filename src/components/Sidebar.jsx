@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 import "../styles/sidebar.css";
 
 export default function Sidebar({ onLogout }) {
   const [open, setOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(false); // state for dark mode
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Whenever darkMode changes, toggle the .dark class on body
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   const go = (page) => navigate(`/${page}`);
   const isActive = (path) => location.pathname === `/${path}`;
@@ -18,7 +28,7 @@ export default function Sidebar({ onLogout }) {
         <button className="menu-btn" onClick={() => setOpen(!open)}>
           ☰
         </button>
-        {open && <span className="logo">Campus Helper</span>}
+        {open && <span className="logo">CampusAI</span>}
       </div>
 
       <nav>
@@ -31,7 +41,8 @@ export default function Sidebar({ onLogout }) {
       </nav>
 
       <div className="sidebar-footer">
-        <ThemeToggle open={open} />
+        {/* Pass the toggle function to ThemeToggle */}
+        <ThemeToggle open={open} darkMode={darkMode} setDarkMode={setDarkMode} />
         <SidebarItem label="Logout" icon="🚪" open={open} onClick={onLogout} danger />
       </div>
     </div>

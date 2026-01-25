@@ -13,10 +13,7 @@
   overflow: hidden;
 }
 
-
-/* ===============================
-   SOFT BLUR BACKGROUND LAYER
-================================ */
+/* SOFT BLUR BACKGROUND LAYER */
 .dashboard-container::before {
   content: "";
   position: absolute;
@@ -27,7 +24,7 @@
 
   background: radial-gradient(
     circle at top left,
-    rgba(99, 102, 241, 0.15),
+    rgba(17, 19, 112, 0.15),
     transparent 60%
   );
 
@@ -36,11 +33,8 @@
   pointer-events: none;
 }
 
-
-/* ===============================
-   HEADER (HELLO WELCOME)
-================================ */
-.dashboard-header {
+/* HEADER (GLASS EFFECT) */
+.dashboard-container .dashboard-header {
   position: relative;
   z-index: 2;
   margin-bottom: 36px;
@@ -54,32 +48,31 @@
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-.dark .dashboard-header {
+/* DARK MODE INSIDE DASHBOARD ONLY */
+.dashboard-container.dark .dashboard-header {
   background: rgba(15, 23, 42, 0.55);
 }
 
-/* Title */
-.dashboard-title {
+/* TITLE */
+.dashboard-container .dashboard-title {
   font-size: 28px;
   font-weight: 700;
   margin: 0;
 }
 
-.dashboard-title span {
+.dashboard-container .dashboard-title span {
   color: #6366f1;
 }
 
-/* Subtitle */
-.dashboard-subtitle {
+/* SUBTITLE */
+.dashboard-container .dashboard-subtitle {
   margin-top: 6px;
   font-size: 15px;
   opacity: 0.8;
 }
 
-/* ===============================
-   CARDS GRID
-================================ */
-.cards {
+/* CARDS GRID */
+.dashboard-container .cards {
   position: relative;
   z-index: 2;
 
@@ -88,10 +81,8 @@
   gap: 26px;
 }
 
-/* ===============================
-   CARD
-================================ */
-.card {
+/* CARD */
+.dashboard-container .card {
   height: 200px;
   border-radius: 22px;
   padding: 22px;
@@ -106,16 +97,49 @@
   color: white;
 
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-.card:hover {
+/* DARK MODE: dashboard background */
+.dashboard-container.dark {
+  background: #000000;
+  color: #ffffff; /* ensures text inside dashboard is visible */
+}
+
+/* DARK MODE: header inside dashboard */
+.dashboard-container.dark .dashboard-header {
+  background: rgba(15, 23, 42, 0.85); /* darker glass effect */
+}
+
+/* DARK MODE: cards inside dashboard */
+.dashboard-container.dark .card {
+  background: #1e1e1e; /* dark grey/black for cards */
+  color: #ffffff; /* white text for contrast */
+  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08); /* optional: lighter shadow */
+}
+
+/* DARK MODE: card icons */
+.dashboard-container.dark .card .icon {
+  background: rgba(255, 255, 255, 0.1); /* lighter for dark background */
+}
+.dashboard-container.dark .card {
+  background: #1e1e1e !important; /* force black background */
+  color: #ffffff !important;      /* force white text */
+  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08) !important;
+}
+
+.dashboard-container.dark {
+  background: #000000 !important;
+}
+
+
+.dashboard-container .card:hover {
   transform: translateY(-8px);
   box-shadow: 0 26px 55px rgba(0, 0, 0, 0.28);
 }
 
 /* ICON */
-.card .icon {
+.dashboard-container .card .icon {
   width: 60px;
   height: 60px;
   border-radius: 18px;
@@ -130,51 +154,47 @@
 }
 
 /* TEXT */
-.card h3 {
+.dashboard-container .card h3 {
   font-size: 18px;
   margin: 0;
 }
 
-.card p {
+.dashboard-container .card p {
   font-size: 14px;
   margin-top: 6px;
   opacity: 0.9;
 }
 
-/* ===============================
-   CARD GRADIENTS
-================================ */
-.purple {
+/* CARD GRADIENTS */
+.dashboard-container .purple {
   background: linear-gradient(135deg, #8b5cf6, #6366f1);
 }
 
-.blue {
+.dashboard-container .blue {
   background: linear-gradient(135deg, #38bdf8, #2563eb);
 }
 
-.green {
+.dashboard-container .green {
   background: linear-gradient(135deg, #34d399, #16a34a);
 }
 
-.pink {
+.dashboard-container .pink {
   background: linear-gradient(135deg, #f472b6, #db2777);
 }
 
-.orange {
+.dashboard-container .orange {
   background: linear-gradient(135deg, #fb923c, #facc15);
 }
 
-/* ===============================
-   RESPONSIVE
-================================ */
+/* RESPONSIVE */
 @media (max-width: 1100px) {
-  .cards {
+  .dashboard-container .cards {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 700px) {
-  .cards {
+  .dashboard-container .cards {
     grid-template-columns: 1fr;
   }
 }

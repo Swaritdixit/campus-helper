@@ -111,7 +111,11 @@ body {
 .add-btn:hover {
   transform: scale(1.1);
 }
-
+.add-btn.dark{
+  box-shadow: 0 8px 20px rgba(9, 133, 195, 0.35);
+  background:rgb(64, 215, 232);
+  color: green;
+}
 /* ===============================
    CLEAR BUTTON
 ================================ */
@@ -342,6 +346,4 @@ body {
 .dark .events-today {
   background: transparent;
 }
-.dark * {
-  background-color: unset;
-}
+

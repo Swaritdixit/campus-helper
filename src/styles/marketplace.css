@@ -1,3 +1,7 @@
+/* ===============================
+   Marketplace Cards
+================================ */
+
 /* Bigger card */
 .marketplace-card {
   display: flex;
@@ -9,6 +13,7 @@
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Bigger image */
@@ -19,6 +24,7 @@
   object-fit: cover;
   background: #eee;
   flex-shrink: 0;
+  transition: background 0.3s ease;
 }
 
 /* Seller contact */
@@ -26,6 +32,7 @@
   margin-top: 8px;
   font-size: 13px;
   color: #374151;
+  transition: color 0.3s ease;
 }
 
 .marketplace-seller span {
@@ -43,6 +50,7 @@
   color: white;
   text-decoration: none;
   width: fit-content;
+  transition: background 0.3s ease;
 }
 
 .marketplace-contact:hover {
@@ -63,13 +71,51 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   z-index: 1000;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .sell-button:hover {
   background: #15803d;
 }
 
-/* Mobile tweaks */
+/* ===============================
+   Dark Mode Overrides
+================================ */
+.dark .marketplace-card {
+  background: #1e1e2f;
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dark .marketplace-image {
+  background: #2a2a3d;
+}
+
+.dark .marketplace-seller {
+  color: #c7d2fe;
+}
+
+.dark .marketplace-contact {
+  background: #2563eb; /* keep same blue or make slightly darker if preferred */
+  color: white;
+}
+
+.dark .marketplace-contact:hover {
+  background: #1d4ed8;
+}
+
+.dark .sell-button {
+  background: #16a34a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.dark .sell-button:hover {
+  background: #15803d;
+}
+
+/* ===============================
+   Mobile tweaks
+================================ */
 @media (max-width: 480px) {
   .marketplace-image {
     width: 100px;

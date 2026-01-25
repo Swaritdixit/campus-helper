@@ -1,10 +1,6 @@
-/* ===============================
-   GLOBAL THEME VARIABLES
-================================ */
-
 :root {
-  /* Base */
-  --bg: #f8fafc;
+  /* Base (light mode) */
+  --bg: #f8fafc; /* light background */
   --text: #0f172a;
 
   /* Sidebar */
@@ -22,23 +18,22 @@
 }
 
 /* ===============================
-   DARK MODE
+   DARK MODE VARIABLES
 ================================ */
-
 .dark {
-  --bg: #020617;
-  --text: #e5e7eb;
+  --bg: #000000; /* dark background */
+  --text: #ffffff;
 
   --sidebar-bg: linear-gradient(180deg, #0f172a, #020617);
   --sidebar-text: #c7d2fe;
   --sidebar-hover: rgba(255, 255, 255, 0.08);
   --sidebar-active: linear-gradient(135deg, #6366f1, #3b82f6);
 
-  /* 🔥 CRITICAL: no light canvas */
-  --content-bg: transparent;
+  --content-bg: radial-gradient(circle at top, #0f172a, #1e1e2f);
 
   --card-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
 }
+
 
 /* ===============================
    GLOBAL RESETS
