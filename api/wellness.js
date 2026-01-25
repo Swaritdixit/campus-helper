@@ -39,3 +39,11 @@ User message: ${message}
     return res.status(500).json({ error: "Backend failed" });
   }
 }
+export default function handler(req, res) {
+  // Example: only GET requests
+  if (req.method === 'GET') {
+    res.status(200).json({ message: 'Wellness API works!' });
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
+  }
+}
