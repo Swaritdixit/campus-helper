@@ -1,136 +1,46 @@
-import React, { useState, useRef, useEffect } from "react";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import "../styles/wellness.css";
-export const config = {
-  runtime: "nodejs"
-};
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
-export default function Wellness() {
-  const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
-  const [hasStarted, setHasStarted] = useState(false);
-  const chatEndRef = useRef(null);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory]);
+const API_KEY = process.env.API_KEY;
 
-  const send = async () => {
-    if (!msg.trim() || loading) return;
+if (!API_KEY) {
+  console.error("❌ API_KEY missing in environment variables");
+}
 
-    const userMsg = msg;
-    setMsg("");
-    setLoading(true);
-    if (!hasStarted) setHasStarted(true);
+const genAI = new GoogleGenerativeAI(API_KEY);
 
-    // show user message instantly
-    setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-    try {
-      console.log("➡ Sending message to /api/wellness:", userMsg);
+  try {
+    const { userMessage } = req.body;
 
-      const res = await fetch("/api/wellness", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMsg }),
-      });
-
-      console.log("⬅ Response received:", res);
-
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("❌ Backend error:", res.status, text);
-        throw new Error("Backend failed");
-      }
-
-      const data = await res.json();
-      console.log("✅ Parsed JSON from backend:", data);
-
-      const aiReply =
-        data?.reply ||
-        "I'm here with you. Can you tell me a little more?";
-
-      // replace placeholder
-      setChatHistory(prev => {
-        const updated = [...prev];
-        updated[updated.length - 1].ai = aiReply;
-        return updated;
-      });
-
-      // save chat
-      await addDoc(collection(db, "wellness_chats"), {
-        message: userMsg,
-        reply: aiReply,
-        createdAt: new Date(),
-      });
-
-      console.log("💾 Saved chat to Firestore");
-    } catch (err) {
-      console.error("🔥 Wellness API failed:", err);
-
-      setChatHistory(prev => {
-        const updated = [...prev];
-        updated[updated.length - 1].ai =
-          "I'm having a little trouble right now, but I'm still here with you 💙";
-        return updated;
-      });
-    } finally {
-      setLoading(false);
+    if (!userMessage || typeof userMessage !== "string") {
+      return res.status(400).json({ error: "userMessage missing" });
     }
-  };
 
-  return (
-    <div className="wellness-container">
-      {!hasStarted && (
-        <>
-          <div className="wellness-heart">❤️</div>
-          <h1 className="wellness-title">MindCare AI</h1>
-          <p className="wellness-subtitle">
-            Your personal mental wellness companion.
-            <br />
-            Safe. Anonymous. Supportive.
-          </p>
-        </>
-      )}
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      systemInstruction: `
+You are MindCare AI, a calm, empathetic self-care assistant.
+Your job is to:
+- Respond gently and supportively
+- Never judge or lecture
+- Encourage reflection and emotional safety
+- Keep responses short, warm, and human
+      `,
+    });
 
-      <div className={`chat-container ${hasStarted ? "chat-started" : ""}`}>
-        <div className="chat-box">
-          {chatHistory.map((chat, i) => (
-            <div key={i} className="chat-message">
-              <p className="user-msg">{chat.user}</p>
-              <p className="ai-msg">{chat.ai}</p>
-            </div>
-          ))}
-          <div ref={chatEndRef} />
-        </div>
+    const result = await model.generateContent(userMessage);
 
-        <div className="input-area">
-          <input
-            className="wellness-input"
-            value={msg}
-            onChange={e => setMsg(e.target.value)}
-            placeholder="How are you feeling today?"
-            disabled={loading}
-            onKeyDown={e => e.key === "Enter" && send()}
-          />
-          <button
-            className="wellness-button"
-            onClick={send}
-            disabled={loading}
-          >
-            {loading ? "Thinking..." : "Send"}
-          </button>
-        </div>
-      </div>
+    const reply =
+      result?.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "I'm here with you. Want to talk a little more about how you're feeling?";
 
-      {!hasStarted && (
-        <p className="wellness-footer">You are not alone 💙</p>
-      )}
-    </div>
-  );
+    return res.status(200).json({ reply });
+  } catch (err) {
+    console.error("❌ Wellness API error:", err);
+    return res.status(500).json({ error: "Backend failed" });
+  }
 }
