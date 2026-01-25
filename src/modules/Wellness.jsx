@@ -20,7 +20,6 @@ export default function Wellness() {
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // send dynamic user input to backend
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,7 +31,7 @@ export default function Wellness() {
       const data = await res.json();
       const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
 
-      // save to Firestore
+      // Save to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: msg,
         reply: aiReply,
