@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       console.error("Missing GOOGLE_API_KEY");
       return res.status(500).json({ error: "Server misconfigured" });
     }
-
+console.log("Gemini Key Loaded:", !!API_KEY);
     // ✅ SYSTEM PROMPT
     const prompt = `
 You are MindCare AI.
