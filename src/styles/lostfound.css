@@ -1,24 +1,34 @@
 .lf-page {
   padding: 16px;
+  position: relative;
 }
 
 /* =====================
-   MAIN TABS
+   TOP CONTROLS: Tabs + Toggle
 ===================== */
+.lf-top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* TABS */
 .lf-tabs {
   display: flex;
   gap: 10px;
-  margin-bottom: 14px;
 }
 
 .lf-tabs button {
-  flex: 1;
-  padding: 10px;
+  padding: 10px 16px;
   border-radius: 999px;
   border: none;
   background: #e5e7eb;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s, color 0.3s;
 }
 
 .lf-tabs button.active {
@@ -26,14 +36,11 @@
   color: white;
 }
 
-/* =====================
-   TOGGLE
-===================== */
+/* TOGGLE */
 .lf-toggle {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 10px 4px 16px;
+  gap: 10px;
   font-weight: 500;
 }
 
@@ -76,62 +83,114 @@
 }
 
 /* =====================
-   GRID + CARDS
+   GRID + CARDS (Marketplace style)
 ===================== */
 .lf-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
   padding-bottom: 90px;
 }
 
 .lf-card {
+  display: flex;
+  flex-direction: column;
   background: white;
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .lf-card img {
   width: 100%;
-  height: 120px;
+  height: 160px;
   object-fit: cover;
+  transition: all 0.3s ease;
 }
 
 .lf-content {
-  padding: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
 }
 
 .lf-content h3 {
-  font-size: 15px;
-  margin-bottom: 4px;
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 
 .lf-content p {
-  font-size: 13px;
+  font-size: 14px;
   color: #555;
   margin-bottom: 6px;
 }
 
 .lf-location {
-  font-size: 12px;
+  font-size: 13px;
   color: #777;
 }
 
-/* =====================
-   FLOATING ADD BUTTON
-===================== */
-.fab {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: none;
-  font-size: 34px;
-  background: linear-gradient(135deg, #7b61ff, #5b3df5);
+.contact-owner-btn {
+  margin-top: auto;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+  background: #2563eb;
   color: white;
-  box-shadow: 0 10px 28px rgba(123,97,255,0.45);
+  border: none;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact-owner-btn:hover {
+  background: #1d4ed8;
+}
+
+/* =====================
+   ZOOM / FOCUS
+===================== */
+.lf-card.blur-background {
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.lf-card.focused {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 500px;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.lf-card.focused img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+/* =====================
+   Dark Mode
+===================== */
+.dark .lf-page {
+  background: #020617;
+}
+
+.dark .lf-card {
+  background: #1e1e2f;
+  color: #fff;
+  box-shadow: 0 14px 34px rgba(255,255,255,0.08);
+}
+
+.dark .contact-owner-btn {
+  background: #4f8cff;
+}
+
+.dark .contact-owner-btn:hover {
+  background: #2563eb;
 }

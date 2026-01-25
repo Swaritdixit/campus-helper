@@ -22,6 +22,7 @@ export default function Pulse() {
   const auth = getAuth();
   const user = auth.currentUser;
 
+  /* ---------------- FETCH POLLS ---------------- */
   useEffect(() => {
     getDocs(collection(db, "pulse_polls")).then((snap) => {
       setPolls(
@@ -34,20 +35,13 @@ export default function Pulse() {
   }, []);
 
   /* ---------------- VOTE LOGIC ---------------- */
-
   const vote = async (poll, choice) => {
     const key = `pulse_vote_${poll.id}`;
     const prev = localStorage.getItem(key);
 
     if (prev === choice) return;
 
-    const updates = {};
-    if (prev) updates[prev === "A" ? "countA" : "countB"] = increment(-1);
-    updates[choice === "A" ? "countA" : "countB"] = increment(1);
-
-    await updateDoc(doc(db, "pulse_polls", poll.id), updates);
-    localStorage.setItem(key, choice);
-
+    // 1️⃣ Optimistic update locally
     setPolls((prevPolls) =>
       prevPolls.map((p) =>
         p.id === poll.id
@@ -69,6 +63,41 @@ export default function Pulse() {
           : p
       )
     );
+    localStorage.setItem(key, choice);
+
+    // 2️⃣ Update Firebase in background
+    try {
+      const updates = {};
+      if (prev) updates[prev === "A" ? "countA" : "countB"] = increment(-1);
+      updates[choice === "A" ? "countA" : "countB"] = increment(1);
+      await updateDoc(doc(db, "pulse_polls", poll.id), updates);
+    } catch (err) {
+      console.error("Firebase update failed", err);
+
+      // Optional: revert local change if Firebase fails
+      setPolls((prevPolls) =>
+        prevPolls.map((p) =>
+          p.id === poll.id
+            ? {
+                ...p,
+                countA:
+                  choice === "A"
+                    ? p.countA - 1
+                    : prev === "A"
+                    ? p.countA + 1
+                    : p.countA,
+                countB:
+                  choice === "B"
+                    ? p.countB - 1
+                    : prev === "B"
+                    ? p.countB + 1
+                    : p.countB,
+              }
+            : p
+        )
+      );
+      localStorage.setItem(key, prev || "");
+    }
   };
 
   const resetVote = async (poll) => {
@@ -76,12 +105,7 @@ export default function Pulse() {
     const prev = localStorage.getItem(key);
     if (!prev) return;
 
-    await updateDoc(doc(db, "pulse_polls", poll.id), {
-      [prev === "A" ? "countA" : "countB"]: increment(-1),
-    });
-
-    localStorage.removeItem(key);
-
+    // Optimistic update
     setPolls((prevPolls) =>
       prevPolls.map((p) =>
         p.id === poll.id
@@ -93,10 +117,33 @@ export default function Pulse() {
           : p
       )
     );
+    localStorage.removeItem(key);
+
+    // Update Firebase in background
+    try {
+      await updateDoc(doc(db, "pulse_polls", poll.id), {
+        [prev === "A" ? "countA" : "countB"]: increment(-1),
+      });
+    } catch (err) {
+      console.error("Firebase reset failed", err);
+
+      // Revert local change if needed
+      setPolls((prevPolls) =>
+        prevPolls.map((p) =>
+          p.id === poll.id
+            ? {
+                ...p,
+                countA: prev === "A" ? p.countA + 1 : p.countA,
+                countB: prev === "B" ? p.countB + 1 : p.countB,
+              }
+            : p
+        )
+      );
+      localStorage.setItem(key, prev);
+    }
   };
 
   /* ---------------- ADD POLL ---------------- */
-
   const addPoll = async () => {
     if (!question || !optionA || !optionB) return;
 
@@ -129,10 +176,14 @@ export default function Pulse() {
     setShowAdd(false);
   };
 
+  /* ---------------- RENDER ---------------- */
   return (
     <div className="pulse-container">
       {user && (
-        <button className="pulse-add-btn" onClick={() => setShowAdd(!showAdd)}>
+        <button
+          className="pulse-add-btn"
+          onClick={() => setShowAdd(!showAdd)}
+        >
           + Add Poll
         </button>
       )}
