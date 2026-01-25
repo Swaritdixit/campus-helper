@@ -122,3 +122,10 @@ nav {
   padding: 10px;
   margin-bottom: 12px;
 }
+.sidebar-footer {
+  padding: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

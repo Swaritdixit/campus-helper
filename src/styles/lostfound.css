@@ -1,0 +1,137 @@
+.lf-page {
+  padding: 16px;
+}
+
+/* =====================
+   MAIN TABS
+===================== */
+.lf-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.lf-tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: #e5e7eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lf-tabs button.active {
+  background: #7b61ff;
+  color: white;
+}
+
+/* =====================
+   TOGGLE
+===================== */
+.lf-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 4px 16px;
+  font-weight: 500;
+}
+
+.switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #e5e7eb;
+  border-radius: 999px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 2px;
+  left: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background: #7b61ff;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* =====================
+   GRID + CARDS
+===================== */
+.lf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  padding-bottom: 90px;
+}
+
+.lf-card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+
+.lf-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.lf-content {
+  padding: 12px;
+}
+
+.lf-content h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.lf-content p {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.lf-location {
+  font-size: 12px;
+  color: #777;
+}
+
+/* =====================
+   FLOATING ADD BUTTON
+===================== */
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 34px;
+  background: linear-gradient(135deg, #7b61ff, #5b3df5);
+  color: white;
+  box-shadow: 0 10px 28px rgba(123,97,255,0.45);
+  cursor: pointer;
+}

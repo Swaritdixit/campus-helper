@@ -1,0 +1,347 @@
+/* ===============================
+   VARIABLES FOR LIGHT/DARK MODE
+================================ */
+:root {
+  --bg: #f8fafc;
+  --text: #0f172a;
+
+  --accent: #23c1e1;
+  --accent-hover: #2fd6b8;
+
+  --button-bg: var(--accent);
+  --button-text: #ffffff;
+
+  --clear-bg: #ffffff;
+  --clear-border: #ddd;
+  --clear-hover: #f1f1f1;
+
+  --delete-bg: #ffecec;
+  --delete-text: #d63031;
+  --delete-hover: #ffbcbc;
+
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  --input-bg: #ffffff;
+  --input-border: #ccc;
+}
+
+/* ===============================
+   DARK MODE
+================================ */
+.dark {
+  --bg: #020617;
+  --text: #e5e7eb;
+
+  --accent: #0985c3;
+  --accent-hover: #235c8b;
+
+  --button-bg: var(--accent);
+  --button-text: #ffffff;
+
+  --clear-bg: #111827;
+  --clear-border: #374151;
+  --clear-hover: #1f2937;
+
+  --delete-bg: #3b1f1f;
+  --delete-text: #ff6b6b;
+  --delete-hover: #5a2626;
+
+  /* 👇 FIXED CARD SURFACE */
+  --card-bg: linear-gradient(
+    180deg,
+    #1b1f2a 0%,
+    #141826 100%
+  );
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+
+  --input-bg: #0f172a;
+  --input-border: #374151;
+}
+
+/* ===============================
+   GENERAL
+================================ */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.events-page {
+  max-width: 900px;
+  margin: auto;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.events-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ===============================
+   ADD BUTTON
+================================ */
+.add-btn {
+  font-size: 22px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(92, 182, 231, 0.35);
+  transition: transform 0.2s;
+}
+
+.add-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ===============================
+   CLEAR BUTTON
+================================ */
+.clear-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--clear-border);
+  background: var(--clear-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.clear-btn:hover {
+  background: var(--clear-hover);
+}
+
+/* ===============================
+   TODAY
+================================ */
+.events-today {
+  margin: 15px 0;
+}
+
+/* ===============================
+   CALENDAR NAV
+================================ */
+.calendar-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.calendar-navigation button {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.calendar-navigation button:hover {
+  background: var(--accent-hover);
+}
+
+.calendar-navigation select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+/* ===============================
+   CALENDAR
+================================ */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.calendar-day {
+  padding: 14px 0;
+  text-align: center;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-day.has-event {
+  background: rgba(136, 203, 241, 0.18);
+  font-weight: 600;
+}
+
+.calendar-day.selected {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.calendar-day:hover {
+  transform: translateY(-2px);
+}
+
+/* ===============================
+   EVENTS SECTION
+================================ */
+.events-section {
+  margin-top: 25px;
+}
+
+.event-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 14px;
+  border-radius: 16px;
+  margin-top: 12px;
+  box-shadow: var(--card-shadow);
+}
+
+/* ===============================
+   DELETE BUTTON
+================================ */
+.delete-btn {
+  background: var(--delete-bg);
+  color: var(--delete-text);
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background: var(--delete-hover);
+  transform: scale(1.1);
+}
+
+/* ===============================
+   MODAL
+================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 25px 20px;
+  border-radius: 18px;
+  width: 360px;
+  box-shadow: var(--card-shadow);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+  color: var(--accent);
+  text-align: center;
+}
+
+.modal input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.modal input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* ===============================
+   MODAL ACTIONS
+================================ */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-actions button:first-child {
+  background: var(--clear-bg);
+  color: var(--text);
+}
+
+.modal-actions button:first-child:hover {
+  background: var(--clear-hover);
+}
+
+.modal-actions button:last-child {
+  background: var(--button-bg);
+  color: var(--button-text);
+}
+
+.modal-actions button:last-child:hover {
+  background: var(--accent-hover);
+}
+
+/* ===============================
+   MISC
+================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.muted {
+  color: #9ca3af;
+}
+.dark .events-page,
+.dark .events-section,
+.dark .calendar-grid,
+.dark .events-today {
+  background: transparent;
+}
+.dark * {
+  background-color: unset;
+}

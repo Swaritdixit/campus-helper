@@ -1,0 +1,78 @@
+/* Bigger card */
+.marketplace-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+/* Bigger image */
+.marketplace-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #eee;
+  flex-shrink: 0;
+}
+
+/* Seller contact */
+.marketplace-seller {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.marketplace-seller span {
+  font-weight: 600;
+}
+
+/* Contact button */
+.marketplace-contact {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.marketplace-contact:hover {
+  background: #1d4ed8;
+}
+
+/* Floating Sell Button */
+.sell-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #16a34a;
+  color: white;
+  border-radius: 50px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.sell-button:hover {
+  background: #15803d;
+}
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .marketplace-image {
+    width: 100px;
+    height: 100px;
+  }
+}

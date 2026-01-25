@@ -1,34 +1,21 @@
 import React, { useState, useEffect } from "react";
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ open }) {
   const [darkMode, setDarkMode] = useState(false);
 
-  // Apply theme to body
   useEffect(() => {
-    if (darkMode) {
-      document.body.style.backgroundColor = "#121212";
-      document.body.style.color = "#ffffff";
-    } else {
-      document.body.style.backgroundColor = "#ffffff";
-      document.body.style.color = "#000000";
-    }
+    document.body.style.backgroundColor = darkMode ? "#121212" : "#ffffff";
+    document.body.style.color = darkMode ? "#ffffff" : "#000000";
   }, [darkMode]);
 
   return (
-    <button
-      style={{
-        float: "right",
-        padding: "8px 12px",
-        fontSize: "16px",
-        cursor: "pointer",
-        border: "1px solid #ccc",
-        borderRadius: "5px",
-        backgroundColor: darkMode ? "#333" : "#eee",
-        color: darkMode ? "#fff" : "#000",
-      }}
+    <div
+      className="sidebar-item"
       onClick={() => setDarkMode(!darkMode)}
+      style={{ marginTop: "6px" }}
     >
-      {darkMode ? "☀️" : "🌙"}
-    </button>
+      <span className="icon">{darkMode ? "☀️" : "🌙"}</span>
+      {open && <span className="text">{darkMode ? "Light Mode" : "Dark Mode"}</span>}
+    </div>
   );
 }
