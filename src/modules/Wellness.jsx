@@ -10,6 +10,7 @@ export default function Wellness() {
   const [hasStarted, setHasStarted] = useState(false);
   const chatEndRef = useRef(null);
 
+  // Scroll chat to bottom when new messages arrive
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
@@ -21,7 +22,7 @@ export default function Wellness() {
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // Only send user message to serverless function
+      // Send only the user message to the backend
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -73,17 +74,17 @@ export default function Wellness() {
 
         <div className="input-area">
           <input
-            className="wellness-input"
             value={msg}
             onChange={e => setMsg(e.target.value)}
             placeholder="How are you feeling today?"
             disabled={loading}
             onKeyDown={e => e.key === "Enter" && send()}
+            className="wellness-input"
           />
           <button
-            className="wellness-button"
             onClick={send}
             disabled={loading}
+            className="wellness-button"
           >
             {loading ? "Thinking..." : "Send"}
           </button>
