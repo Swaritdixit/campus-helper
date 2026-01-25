@@ -1,4 +1,3 @@
-// /api/wellness.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.GOOGLE_API_KEY;
@@ -12,8 +11,10 @@ export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: "Prompt missing" });
+  const { userMessage } = req.body;
+  if (!userMessage) return res.status(400).json({ error: "Message missing" });
+
+  const prompt = `You are a calm, empathetic mental wellness assistant. Respond kindly and supportively.\nUser: ${userMessage}`;
 
   try {
     const result = await model.generateContent(prompt);
