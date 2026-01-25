@@ -10,12 +10,10 @@ export default function Wellness() {
   const [hasStarted, setHasStarted] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Scroll to bottom when chat updates
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  // Send message to serverless API
   const send = async () => {
     if (!msg.trim() || loading) return;
 
@@ -23,24 +21,23 @@ export default function Wellness() {
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // Call serverless wellness API
+      // Only send user message to serverless function
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: msg }), // only user message
+        body: JSON.stringify({ userMessage: msg }),
       });
 
       const data = await res.json();
       const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
 
-      // Save chat in Firestore
+      // Save chat to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: msg,
         reply: aiReply,
         createdAt: new Date(),
       });
 
-      // Update local chat
       setChatHistory(prev => [...prev, { user: msg, ai: aiReply }]);
       setMsg("");
     } catch (err) {
@@ -52,7 +49,6 @@ export default function Wellness() {
 
   return (
     <div className="wellness-container">
-      {/* Initial header */}
       {!hasStarted && (
         <>
           <div className="wellness-heart">❤️</div>
@@ -64,7 +60,6 @@ export default function Wellness() {
         </>
       )}
 
-      {/* Chat area */}
       <div className={`chat-container ${hasStarted ? "chat-started" : ""}`}>
         <div className="chat-box">
           {chatHistory.map((chat, i) => (

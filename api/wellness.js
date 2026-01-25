@@ -14,7 +14,10 @@ export default async function handler(req, res) {
   const { userMessage } = req.body;
   if (!userMessage) return res.status(400).json({ error: "Message missing" });
 
-  const prompt = `You are a calm, empathetic mental wellness assistant. Respond kindly and supportively.\nUser: ${userMessage}`;
+  // Full prompt logic only in backend
+  const prompt = `You are a calm, empathetic mental wellness assistant. 
+Respond kindly and supportively. 
+User: ${userMessage}`;
 
   try {
     const result = await model.generateContent(prompt);
