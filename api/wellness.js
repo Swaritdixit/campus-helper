@@ -19,11 +19,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Server misconfigured" });
     }
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
-
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-    });
+    // Initialize client
+    const aiClient = new GoogleGenerativeAI({ apiKey: API_KEY });
 
     const prompt = `
 You are MindCare AI, a calm, empathetic mental wellness assistant.
@@ -35,8 +32,14 @@ User says:
 "${message}"
 `;
 
-    const result = await model.generateContent(prompt);
-    const reply = result.response.text();
+    // Generate response
+    const result = await aiClient.generateText({
+      model: "gemini-1.5-flash",
+      text: prompt,
+    });
+
+    // Extract the AI's reply
+    const reply = result.output[0].content;
 
     return res.status(200).json({ reply });
   } catch (err) {
