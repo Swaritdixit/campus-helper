@@ -22,35 +22,32 @@ export default function Wellness() {
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
-    // Show user message immediately
+    // show user message instantly
     setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
 
     try {
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: userMsg }),
+
+        // 🔥 FIX: backend expects "message"
+        body: JSON.stringify({ message: userMsg }),
       });
 
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error("Invalid JSON from server");
-      }
+      if (!res.ok) throw new Error("Backend failed");
 
+      const data = await res.json();
       const aiReply =
         data?.reply ||
         "I'm here to listen. Can you tell me more?";
 
-      // Update last AI placeholder
+      // replace placeholder
       setChatHistory(prev => {
         const updated = [...prev];
         updated[updated.length - 1].ai = aiReply;
         return updated;
       });
 
-      // Save to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: userMsg,
         reply: aiReply,
