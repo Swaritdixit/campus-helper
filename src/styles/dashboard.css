@@ -12,6 +12,44 @@
 
   overflow: hidden;
 }
+.dashboard-app {
+  margin-top: 22px;
+  padding: 20px 26px;
+  border-radius: 18px;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.55);
+  cursor: pointer;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dashboard-app a {
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+.dashboard-app:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 60px rgba(99, 102, 241, 0.8);
+}
+
+/* DARK MODE APP CTA */
+.dashboard-container.dark .dashboard-app {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  box-shadow: 0 18px 44px rgba(124, 58, 237, 0.65);
+}
+
 
 /* SOFT BLUR BACKGROUND LAYER */
 .dashboard-container::before {

@@ -19,17 +19,18 @@ export default function Home() {
         </p>
 
         {/* APP DOWNLOAD LINE */}
-        <p className="dashboard-subtitle">
-          We also have an app for this —{" "}
-          <a
-            href="https://drive.google.com/file/d/1tnFt2Q9IO3lbopSl4huIYAFGgABWlDdH/view?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "#6cf", textDecoration: "underline" }}
-          >
-            Download APK
-          </a>
-        </p>
+
+      <p className="dashboard-app">
+  📱 We also have an app for this —{" "}
+  <a
+    href="https://drive.google.com/file/d/1tnFt2Q9IO3lbopSl4huIYAFGgABWlDdH/view?usp=sharing"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Download APK
+  </a>
+</p>
+
       </div>
 
       {/* CARDS */}
