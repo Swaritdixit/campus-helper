@@ -4,14 +4,16 @@
 .dashboard-container {
   position: relative;
   padding: 32px;
-  height: 100vh;
+  min-height: 100vh; /* changed from height to allow growth */
   box-sizing: border-box;
 
   background: var(--bg);
   color: var(--text);
 
-  overflow: hidden;
+  overflow-y: auto; /* allows scrolling if content exceeds viewport */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
 }
+
 .dashboard-app {
   margin-top: 22px;
   padding: 20px 26px;
@@ -50,7 +52,6 @@
   box-shadow: 0 18px 44px rgba(124, 58, 237, 0.65);
 }
 
-
 /* SOFT BLUR BACKGROUND LAYER */
 .dashboard-container::before {
   content: "";
@@ -88,7 +89,7 @@
 
 /* DARK MODE INSIDE DASHBOARD ONLY */
 .dashboard-container.dark .dashboard-header {
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(15, 23, 42, 0.85);
 }
 
 /* TITLE */
@@ -117,6 +118,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 26px;
+
+  margin-bottom: 32px; /* added space at the bottom */
 }
 
 /* CARD */
@@ -137,39 +140,6 @@
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
-
-/* DARK MODE: dashboard background */
-.dashboard-container.dark {
-  background: #000000;
-  color: #ffffff; /* ensures text inside dashboard is visible */
-}
-
-/* DARK MODE: header inside dashboard */
-.dashboard-container.dark .dashboard-header {
-  background: rgba(15, 23, 42, 0.85); /* darker glass effect */
-}
-
-/* DARK MODE: cards inside dashboard */
-.dashboard-container.dark .card {
-  background: #1e1e1e; /* dark grey/black for cards */
-  color: #ffffff; /* white text for contrast */
-  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08); /* optional: lighter shadow */
-}
-
-/* DARK MODE: card icons */
-.dashboard-container.dark .card .icon {
-  background: rgba(255, 255, 255, 0.1); /* lighter for dark background */
-}
-.dashboard-container.dark .card {
-  background: #1e1e1e !important; /* force black background */
-  color: #ffffff !important;      /* force white text */
-  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08) !important;
-}
-
-.dashboard-container.dark {
-  background: #000000 !important;
-}
-
 
 .dashboard-container .card:hover {
   transform: translateY(-8px);
@@ -222,6 +192,22 @@
 
 .dashboard-container .orange {
   background: linear-gradient(135deg, #fb923c, #facc15);
+}
+
+/* DARK MODE: dashboard background & cards */
+.dashboard-container.dark {
+  background: #000000;
+  color: #ffffff;
+}
+
+.dashboard-container.dark .card {
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08) !important;
+}
+
+.dashboard-container.dark .card .icon {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* RESPONSIVE */
