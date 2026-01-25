@@ -17,31 +17,54 @@ export default function Wellness() {
   const send = async () => {
     if (!msg.trim() || loading) return;
 
+    const userMsg = msg;
+    setMsg("");
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
+    // Show user message immediately
+    setChatHistory(prev => [...prev, { user: userMsg, ai: "…" }]);
+
     try {
-      // Only send user message to serverless function
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: msg }),
+        body: JSON.stringify({ userMessage: userMsg }),
       });
 
-      const data = await res.json();
-      const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Invalid JSON from server");
+      }
 
-      // Save chat to Firestore
+      const aiReply =
+        data?.reply ||
+        "I'm here to listen. Can you tell me more?";
+
+      // Update last AI placeholder
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1].ai = aiReply;
+        return updated;
+      });
+
+      // Save to Firestore
       await addDoc(collection(db, "wellness_chats"), {
-        message: msg,
+        message: userMsg,
         reply: aiReply,
         createdAt: new Date(),
       });
-
-      setChatHistory(prev => [...prev, { user: msg, ai: aiReply }]);
-      setMsg("");
     } catch (err) {
       console.error("Wellness API failed:", err);
+
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1].ai =
+          "I'm having a little trouble right now, but I'm still here with you 💙";
+        return updated;
+      });
     } finally {
       setLoading(false);
     }
@@ -54,7 +77,8 @@ export default function Wellness() {
           <div className="wellness-heart">❤️</div>
           <h1 className="wellness-title">MindCare AI</h1>
           <p className="wellness-subtitle">
-            Your personal mental wellness companion.<br />
+            Your personal mental wellness companion.
+            <br />
             Safe. Anonymous. Supportive.
           </p>
         </>
@@ -90,7 +114,9 @@ export default function Wellness() {
         </div>
       </div>
 
-      {!hasStarted && <p className="wellness-footer">You are not alone 💙</p>}
+      {!hasStarted && (
+        <p className="wellness-footer">You are not alone 💙</p>
+      )}
     </div>
   );
 }
