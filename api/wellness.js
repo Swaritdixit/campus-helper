@@ -1,27 +1,46 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const API_KEY = process.env.GOOGLE_API_KEY;
-if (!API_KEY) console.error("❌ GOOGLE_API_KEY missing");
-
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini/2.5/flash" });
-
 export default async function handler(req, res) {
-  if (req.method !== "POST")
+  if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
-
-  const { message } = req.body; // ⚡ match frontend key
-  if (!message) return res.status(400).json({ error: "Message missing" });
+  }
 
   try {
-    const result = await model.generateContent(message);
-    const responseText = result?.response?.text
-      ? result.response.text()
-      : String(result);
+    const { message } = req.body;
 
-    res.status(200).json({ reply: responseText });
+    if (!message) {
+      return res.status(400).json({ error: "Message missing" });
+    }
+
+    const API_KEY = process.env.API_KEY;
+
+    if (!API_KEY) {
+      console.error("❌ API_KEY missing");
+      return res.status(500).json({ error: "Server misconfigured" });
+    }
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+
+    const prompt = `
+You are MindCare AI, a calm, empathetic mental wellness assistant.
+Respond in a supportive, non-judgmental, gentle tone.
+Do not give medical advice.
+Encourage reflection and emotional expression.
+
+User says:
+"${message}"
+`;
+
+    const result = await model.generateContent(prompt);
+    const reply = result.response.text();
+
+    return res.status(200).json({ reply });
   } catch (err) {
-    console.error("Wellness error:", err);
-    res.status(500).json({ error: "Wellness generation failed" });
+    console.error("❌ Wellness Gemini error:", err);
+    return res.status(500).json({ error: "Backend failed" });
   }
 }
