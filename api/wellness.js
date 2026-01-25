@@ -10,12 +10,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: "Prompt missing" });
+  const { message } = req.body; // ⚡ match frontend key
+  if (!message) return res.status(400).json({ error: "Message missing" });
 
   try {
-    // You can add wellness-specific logic here
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(message);
     const responseText = result?.response?.text
       ? result.response.text()
       : String(result);
