@@ -10,29 +10,29 @@ export default function Wellness() {
   const [hasStarted, setHasStarted] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Scroll chat to bottom when new messages arrive
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
   const send = async () => {
     if (!msg.trim() || loading) return;
-
     setLoading(true);
     if (!hasStarted) setHasStarted(true);
 
     try {
-      // Send only the user message to the backend
+      // send dynamic user input to backend
       const res = await fetch("/api/wellness", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userMessage: msg }),
       });
 
+      if (!res.ok) throw new Error("Backend failed");
+
       const data = await res.json();
       const aiReply = data.reply || "I'm here to listen. Can you tell me more?";
 
-      // Save chat to Firestore
+      // save to Firestore
       await addDoc(collection(db, "wellness_chats"), {
         message: msg,
         reply: aiReply,
@@ -81,11 +81,7 @@ export default function Wellness() {
             onKeyDown={e => e.key === "Enter" && send()}
             className="wellness-input"
           />
-          <button
-            onClick={send}
-            disabled={loading}
-            className="wellness-button"
-          >
+          <button onClick={send} disabled={loading} className="wellness-button">
             {loading ? "Thinking..." : "Send"}
           </button>
         </div>
