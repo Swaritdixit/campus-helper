@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import "../styles/wellness.css";
+export const config = {
+  runtime: "nodejs"
+};
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
 export default function Wellness() {
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
